@@ -522,5 +522,33 @@ def get_day(date: date) -> []:
 
     return [meal_calories, workout_calories]
 
+def add_sleep_session(session_date: date, start_time: datetime, end_time: datetime, sleep_quality: str, notes:str = "") -> bool:
 
+    # insert new session
+
+    conn = get_connection()
+    cursor = conn.cursor()
+    return_value: bool = True
+
+    try:
+
+        # insert data into meals table
+        cursor.execute("INSERT INTO sleep (date, start_time, end_time, sleep_quality, notes) VALUES (?, ?, ?, ?, ?)",
+                       (session_date.strftime("%Y-%m-%d"), start_time, end_time, sleep_quality, notes))
+
+        conn.execute("PRAGMA journal_mode=WAL;")
+        conn.commit()
+
+    except Exception as ex:
+
+        print("add_sleep_session - in exception - " + str(ex))
+
+        conn.rollback()
+        return_value = False
+
+    finally:
+
+        conn.close() # close no matter error or not
+
+    return return_value
 

@@ -1,4 +1,6 @@
 #moved some methods from the main program in here to make the main file easier to read and work with
+import datetime
+
 import pathvalidate
 
 # import pathvalidate
@@ -7,6 +9,8 @@ from models.DayEntity import *
 from datetime import date
 from models.CalorieEntity import *
 from models.HealthEntry import *
+from models.SleepQuality import SleepQuality
+from models.SleepSession import SleepSession
 
 from services import health_database
 from services.data_csv_report import write_out_report
@@ -44,6 +48,89 @@ def get_date(input_message):
         else:
             got_value = True
             return wk_date
+
+def get_time(input_message):
+
+    got_value = False
+
+    # get current date
+
+    while not got_value:
+
+        wk_time = input(input_message)
+
+        print("wk_time = " + wk_time)
+
+        if not valid_time(wk_time):
+            print("\n### Error - Time cannot be blank, must be valid and must be in ""HH:MM"" format ###")
+        else:
+            got_value = True
+            return wk_time
+
+def add_meal():
+
+    # get meal date
+
+    meal_date = get_date("\nEnter meal date: ")
+
+    #get meal item
+
+    choice = 0
+    meal_list = list(MealType)
+    total_choices = len(meal_list) + 1
+
+    while choice != total_choices:
+
+        num_choices = 1
+        meal_type = ""
+        meal_description = ""
+        calories: int = 0
+        choice = 0
+        print("### Choose meal: ###")
+
+        for m in meal_list:
+            print(str(num_choices) + ". " + str(m))
+            num_choices += 1
+
+        print(str(num_choices) + ". Exit")
+
+        choice = get_int_range(input("Choose meal number: "), 1, total_choices)
+
+        if choice is None:
+            print("\n### Error - meal item entered must be between 1 and " + str(total_choices) + " ###")
+        elif 1 <= choice <= (total_choices - 1):
+            meal_type = str(meal_list[choice - 1])
+
+            # print("meal_item = " + meal_item)
+
+            while meal_description == "":
+                meal_description =  input("Enter meal description: ").strip()
+
+                if meal_description == "":
+                    print("Entered meal description cannot be blank")
+
+            got_value = False
+
+            while not got_value:
+
+                calories = get_int(input("Enter calories: "))
+
+                if calories is not None and calories > 0:
+                    got_value = True
+                else:
+                    print("\n### Error - calories entered must be greater than 0 and must be an integer ###")
+
+            # add to db
+
+            v = Meal(meal_description, meal_type, calories, 0)
+            v.add_meal(meal_date)
+
+            print("### Meal entry added\n")
+
+        elif choice == total_choices:
+            print("\nSystem Exiting...")
+        else:
+            print("\n### Error - meal item entered must be between 1 and 5 ###")
 
 def add_meal():
 
@@ -170,6 +257,82 @@ def add_workout():
             v.add_workout(workout_date)
 
             print("### Workout entry added\n")
+
+
+def add_sleep_session():
+
+    # get sleep session date
+
+    sleep_start_date = get_date("\nEnter date of sleep session(date you woke up - MM/DD/YYYY): ")
+
+    overnight_day: int = 0
+
+    while overnight_day <= 0 and overnight_day > 2:
+        print("### Add Sleep Session ###\n")
+        print("Type of Sleep:")
+        print("1. Overnight")
+        print("2. Same day sleep")
+        overnight_day = get_int_range(input("\nEnter type of sleep: "),  1, 2)
+        print("overnight_day = " + str(overnight_day))
+
+    sleep_end_date = sleep_start_date
+
+    if(overnight_day == 1):
+        sleep_end_date = sleep_end_date + datetime.timedelta(days=1)
+
+
+    start_time = get_time("Enter start time(HH:MM): ")
+
+    end_time_good = False
+
+    while not end_time_good:
+        end_time = get_time("Enter end time(HH:MM): ")
+        if overnight_day == 2:
+            time_format = "%H:%M"
+            if datetime.strptime(end_time, time_format) > datetime.strptime(start_time, time_format):
+                print("End time can not be greater than start time for same day sleep")
+            else:
+                end_time_good = True
+        else:
+            end_time_good = True
+
+
+    # get sleep session detail
+
+    choice = 0
+    sleep_list = list(SleepQuality)
+    total_choices = len(sleep_list) + 1
+
+    while choice != total_choices:
+
+        num_choices = 1
+
+        print("### Choose Sleep Quality: ###")
+
+        for s in sleep_list:
+            print(str(num_choices) + ". " + str(s))
+            num_choices += 1
+
+        print(str(num_choices) + ". Exit")
+
+        choice = get_int_range(input("\nEnter Sleep Quality Number: "), 1, total_choices)
+
+        if choice is None:
+            print("\n### Error - sleep quality number entered must be between 1 and " + str(total_choices) + " ###")
+        elif 1 <= choice <= (total_choices - 1):
+
+            sleep_quality = str(sleep_list[choice - 1])
+
+    sleep_notes = input("Enter notes on the sleep: ").strip()
+
+
+    # add to db
+
+    v: SleepSession = SleepSession(sleep_start_date + " " + start_time, sleep_end_date + " " + end_time_good, sleep_quality, sleep_notes)
+
+
+    print("### Workout entry added\n")
+
 
 def filter_by_date_range(start_date: date, stop_date: date):
 

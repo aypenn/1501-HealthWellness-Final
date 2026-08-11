@@ -6,3 +6,4 @@ class SleepQuality(Enum):
     Fair = "Fair"
     Good = "Good"
     Excellent = "Excellent"
+
