@@ -1,22 +1,30 @@
 from datetime import datetime, date
 
+from services import health_database
+
 
 class SleepSession:
-    def __init__(self, session_date: date, start_time: datetime, end_time: datetime, sleepquality: str, notes:str = "", id:int = 0) -> None:
+    def __init__(self, session_date: date, start_time:str, end_time: str, sleepquality: str, notes:str = "", id:int = 0) -> None:
         self.__session_date = session_date
         self.__start_time = start_time
         self.__end_time = end_time
         self.__sleepquality = sleepquality
-        self.__id = id
         self.__notes = notes
+        self.__id = id
 
-    def add_sleep_session(self, sleepsession: SleepSession):
-        self.__sleepsession = sleepsession
+    def add_sleep_session(self):
+        return health_database.add_sleep_session(self.session_date(), self.start_time(), self.end_time(), self.sleep_quality(), self.notes())
 
     # getters
 
     def id(self):
         return self.__id
+
+    def session_date(self):
+        return self.__session_date
+
+    def sleep_quality(self):
+        return self.__sleepquality
 
     def start_time(self):
         return self.__start_time

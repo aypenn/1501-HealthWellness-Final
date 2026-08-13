@@ -7,3 +7,5 @@ class SleepQuality(Enum):
     Good = "Good"
     Excellent = "Excellent"
 
+    def __str__(self):
+        return str(self.value)

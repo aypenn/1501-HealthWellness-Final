@@ -45,7 +45,7 @@ def valid_time(time_str : str) -> bool:
         split_time = time_str.split(":")
         hour = get_int(split_time[0])
         minutes = get_int(split_time[1])
-        print("hour = " + str(hour) + " minutes = " + str(minutes))
+
         try:
             time_format = "%H:%M"
             datetime.strptime(time_str, time_format)

@@ -59,8 +59,6 @@ def get_time(input_message):
 
         wk_time = input(input_message)
 
-        print("wk_time = " + wk_time)
-
         if not valid_time(wk_time):
             print("\n### Error - Time cannot be blank, must be valid and must be in ""HH:MM"" format ###")
         else:
@@ -213,10 +211,8 @@ def add_workout():
     while choice != total_choices:
 
         num_choices = 1
-        workout_type = ""
         workout_description = ""
         calories: int = 0
-        choice = 0
 
         print("### Choose workout: ###")
 
@@ -263,11 +259,12 @@ def add_sleep_session():
 
     # get sleep session date
 
-    sleep_start_date = get_date("\nEnter date of sleep session(date you woke up - MM/DD/YYYY): ")
+    sleep_start_date:date = get_date("\nEnter date of sleep session(date you woke up - MM/DD/YYYY): ")
 
     overnight_day: int = 0
 
-    while overnight_day <= 0 and overnight_day > 2:
+    while overnight_day <= 0 or overnight_day > 2:
+
         print("### Add Sleep Session ###\n")
         print("Type of Sleep:")
         print("1. Overnight")
@@ -275,11 +272,10 @@ def add_sleep_session():
         overnight_day = get_int_range(input("\nEnter type of sleep: "),  1, 2)
         print("overnight_day = " + str(overnight_day))
 
-    sleep_end_date = sleep_start_date
+    sleep_end_date: date = sleep_start_date
 
     if(overnight_day == 1):
-        sleep_end_date = sleep_end_date + datetime.timedelta(days=1)
-
+        sleep_end_date = sleep_end_date + timedelta(days=1)
 
     start_time = get_time("Enter start time(HH:MM): ")
 
@@ -289,8 +285,8 @@ def add_sleep_session():
         end_time = get_time("Enter end time(HH:MM): ")
         if overnight_day == 2:
             time_format = "%H:%M"
-            if datetime.strptime(end_time, time_format) > datetime.strptime(start_time, time_format):
-                print("End time can not be greater than start time for same day sleep")
+            if datetime.strptime(end_time, time_format) < datetime.strptime(start_time, time_format):
+                print("End time can not be less than start time for same day sleep")
             else:
                 end_time_good = True
         else:
@@ -299,11 +295,11 @@ def add_sleep_session():
 
     # get sleep session detail
 
-    choice = 0
-    sleep_list = list(SleepQuality)
+    sleep_list = list[SleepQuality](SleepQuality)
     total_choices = len(sleep_list) + 1
 
-    while choice != total_choices:
+    sleep_choice_done = False
+    while not sleep_choice_done:
 
         num_choices = 1
 
@@ -315,23 +311,24 @@ def add_sleep_session():
 
         print(str(num_choices) + ". Exit")
 
-        choice = get_int_range(input("\nEnter Sleep Quality Number: "), 1, total_choices)
+        sleep_choice = get_int_range(input("\nEnter Sleep Quality Number: "), 1, total_choices)
 
-        if choice is None:
+        if sleep_choice is None or sleep_choice < 0 or sleep_choice > (total_choices - 1):
             print("\n### Error - sleep quality number entered must be between 1 and " + str(total_choices) + " ###")
-        elif 1 <= choice <= (total_choices - 1):
+        else:
 
-            sleep_quality = str(sleep_list[choice - 1])
+            sleep_quality = str(sleep_list[sleep_choice - 1])
+            sleep_choice_done = True
 
     sleep_notes = input("Enter notes on the sleep: ").strip()
 
 
     # add to db
 
-    v: SleepSession = SleepSession(sleep_start_date + " " + start_time, sleep_end_date + " " + end_time_good, sleep_quality, sleep_notes)
+    v: SleepSession = SleepSession(sleep_start_date, sleep_start_date.strftime("%Y-%m-%d") + " " + start_time, sleep_end_date.strftime("%Y-%m-%d") + " " + end_time, sleep_quality, sleep_notes)
+    v.add_sleep_session()
 
-
-    print("### Workout entry added\n")
+    print("### Sleep session entry added\n")
 
 
 def filter_by_date_range(start_date: date, stop_date: date):
