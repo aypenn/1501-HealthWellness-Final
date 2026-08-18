@@ -552,3 +552,69 @@ def add_sleep_session(session_date: date, start_time: datetime, end_time: dateti
 
     return return_value
 
+
+def get_sleep_sessions(search_date_date: date) -> []:
+
+    # get workouts for date
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    sleep_sessions = []
+
+    try:
+
+        print("in try")
+
+        sql = f"SELECT start_time, end_time, sleep_quality, notes, id, date FROM sleep WHERE date = '{search_date_date.strftime('%Y-%m-%d')}'"
+
+        cursor.execute(sql)
+
+        rows = cursor.fetchall()
+
+        print("in try - rows = " + str(rows))
+
+        for row in rows:
+            sleep_sessions.append((row[0], row[1], row[2], row[3], row[4], row[5]))
+
+        print("in try - sleep_sessions[] = " + str(sleep_sessions))
+
+    except Exception as ex:
+
+        print("get_sleep_sessions - in exception - " + str(ex))
+
+    finally:
+
+        conn.close()  # close no matter error or not
+
+    return sleep_sessions
+
+
+def update_sleep_session(id:int, star_time: str, end_time:str, sleep_quality: str, notes: str) -> bool:
+
+    # update workout record
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    return_value: bool = True
+
+    try:
+        sql = (f"Update sleep Set star_time = '{star_time}', end_time = {end_time}, sleep_quality = '{sleep_quality}', notes = '{notes}' WHERE id = {id}")
+
+        cursor.execute(sql)
+
+        conn.commit()
+
+    except Exception as ex:
+
+        print("uupdate_sleep_session - in exception - " + str(ex))
+
+        return_value = False
+
+    finally:
+
+        conn.close()  # close no matter error or not
+
+    return return_value
+

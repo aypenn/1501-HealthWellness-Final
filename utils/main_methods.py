@@ -28,7 +28,26 @@ def gen_selection_list(list_elements, header1, header2 = ""):
     choice_number = 1
 
     for element in list_elements:
-        print(str(choice_number) + ". " + str(element))
+        elstr = str(element)
+        elstr = elstr.replace("(", "")
+        elstr = elstr.replace(")", "")
+        print(str(choice_number) + ". " + str(elstr))
+        choice_number += 1
+
+def gen_sleep_session_list(list_elements, header1, header2=""):
+
+    print("\n### " + header1 + " : ###\n")
+
+    if header2 != "":
+        print(header2 + "\n")
+
+    choice_number = 1
+
+    for element in list_elements:
+        elstr = str(element)
+        elstr = elstr.replace("(", "")
+        elstr = elstr.replace(")", "")
+        print(str(choice_number) + ". " + str(elstr))
         choice_number += 1
 
 def get_date(input_message):
@@ -425,19 +444,6 @@ def update_calorie_element(element_type):
 
         mod_selection = ["Modify Item Description", "Modify Calories", "Modify " + element_type + " Type",
                          "Exit Current " + element_type + " Modification"]
-
-        # element_list = []
-        # element_type_list = []
-        #
-        # if element_type == "Meal":
-        #
-        #     element_list = health_database.get_meals(entry_date)
-        #     element_type_list = list(MealType)
-        #
-        # else:
-        #
-        #     element_list = health_database.get_workouts(entry_date)
-        #     element_type_list = list(WorkoutType)
 
         mod_done = False
 
@@ -852,6 +858,145 @@ def update_workout():
             else:
                 mod_done = True
 
+
+def update_sleep_session():
+    # get entity date and dayentity
+
+    entry_date = get_date("\nEnter sleep session Date: ")
+
+    element_list = health_database.get_sleep_sessions(entry_date)
+    sleep_quality_list = list(SleepQuality)
+
+    # check for null
+
+    if len(element_list) == 0:
+
+        print("\nNo Sleep Sessions Entered for ", entry_date.strftime("%m/%d/%Y"), "\n")
+
+    else:
+
+        #  select type of update
+
+        mod_selection = ["Modify Start Time", "Modify End Time", "Modify Quality", "Modify Notes",
+                         "Exit Current Sleep Session Modification"]
+
+        mod_done = False
+
+        while not mod_done:
+
+            max_session_item_choice_number = len(element_list) + 1
+
+            # print ("max_mod_item_choice_number = " +str(max_mod_item_choice_number))
+
+            gen_sleep_session_list(element_list, "Choose Sleep Session to Update")
+            print(str(max_session_item_choice_number) + ". Exit")
+
+            element_choice = get_int_range(input("\nEnter Number to Update: "), 1, max_session_item_choice_number)
+
+            # process choice
+
+            # bad selection
+
+            if element_choice is None or element_choice > max_session_item_choice_number or element_choice < 1:
+
+                print("\n### Error - Number Entered Must be Between 1 And " + str(
+                    max_session_item_choice_number) + " ###")
+
+            elif 1 <= element_choice < max_session_item_choice_number:
+
+                update_done = False
+
+                while not update_done:
+
+                    wk_element = list(element_list[element_choice - 1])
+
+                    max_mod_item_choice_number = len(mod_selection)
+
+                    gen_selection_list(mod_selection, "Choose Modification", str(wk_element))
+
+                    mod_choice = get_int_range(input("\nEnter Modification Choice: "), 1, max_mod_item_choice_number)
+
+                    if mod_choice is None or mod_choice > max_mod_item_choice_number or mod_choice < 1:
+
+                        print("\n### Error - Modify Number Entered Must be Between 1 and " + str(
+                            max_mod_item_choice_number) + " ###")
+
+                    elif mod_choice == 1:
+
+                        # process Modify start time
+
+                        while overnight_day <= 0 or overnight_day > 2:
+                            print("### Add Sleep Session ###\n")
+                            print("Type of Sleep:")
+                            print("1. Overnight")
+                            print("2. Same day sleep")
+                            overnight_day = get_int_range(input("\nEnter type of sleep: "), 1, 2)
+                            print("overnight_day = " + str(overnight_day))
+
+                        start_time = get_time("Enter start time(HH:MM): ")
+
+                    elif mod_choice == 2:
+
+                        # process Modify end time
+
+                        end_time_good = False
+
+                        while not end_time_good:
+                            end_time = get_time("Enter end time(HH:MM): ")
+                            if overnight_day == 2:
+                                time_format = "%H:%M"
+                            if datetime.strptime(end_time, time_format) < datetime.strptime(start_time, time_format):
+                                print("End time can not be less than start time for same day sleep")
+                            else:
+                                end_time_good = True
+                        else:
+                            end_time_good = True
+
+                            # update_element(sleep_quality, wk_element)
+
+                    elif mod_choice == 3:
+
+                        #process quality
+
+                        sleep_quality_done = False
+
+                        while not sleep_quality_done:
+
+                            max_type_choices = len(sleep_quality_list) + 1
+
+                            gen_selection_list(sleep_quality_list, "Choose Workout Type")
+                            print(str(max_type_choices) + ". Exit\n")
+
+                            type_choice = get_int_range(input("Choose Workout Type: "), 1, max_type_choices)
+
+                            # print("type_choice = " + type_choice)
+
+                            if type_choice is None:
+
+                                print("Entered Workout Type Cannot be Blank")
+
+                            elif type_choice < 1 or type_choice > max_type_choices:
+
+                                print("Workout Type Must be Between 1 And " + str(max_type_choices))
+
+                            elif type_choice < max_type_choices:
+                                sleep_quality_choice = sleep_quality_list[type_choice - 1]
+                                wk_element[1] = sleep_quality_choice
+                                element_list[element_choice - 1] = wk_element
+                                health_database.update_sleep_session(wk_element[3], wk_element[0], wk_element[2], wk_element[1])
+                                sleep_quality_done = True
+
+                            else:
+                                sleep_quality_done = True
+                                update_done = True
+
+                    else:
+
+                        # exit
+                        update_done = True
+
+                else:
+                    mod_done = True
 
 
 def delete_element(element_type):
