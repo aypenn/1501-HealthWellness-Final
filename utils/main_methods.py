@@ -970,10 +970,10 @@ def update_sleep_session():
                             end_time = get_time("Enter end time(HH:MM): ")
                             if overnight_day == 2:
                                 time_format = "%H:%M"
-                            if datetime.strptime(end_time, time_format) < datetime.strptime(start_time, time_format):
-                                print("End time can not be less than start time for same day sleep")
-                            else:
-                                end_time_good = True
+                                if datetime.strptime(end_time, time_format) < datetime.strptime(start_time, time_format):
+                                    print("End time can not be less than start time for same day sleep")
+                                else:
+                                    end_time_good = True
                         else:
                             end_time_good = True
 
