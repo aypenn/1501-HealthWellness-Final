@@ -72,7 +72,6 @@ def main():
                     update_workout()
                 case 8:
                     delete_element("Workout")
-
                 case 9:
                     update_sleep_session()
                 case 10:

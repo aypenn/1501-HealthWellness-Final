@@ -35,6 +35,9 @@ class SleepSession:
     def quality(self):
         return self.__quality
 
+    def session_date(self):
+        return self.__session_date
+
     def notes(self):
         return self.__notes
 
@@ -52,8 +55,5 @@ class SleepSession:
     def set_notes(self, notes: str):
         self.__notes = notes
 
-
-
-
     def __str__(self) -> str:
-        return "Id: " + str(self.__id) + " Quality: " + str(self.__quality) + " Start Time: " + str(self.__start_time) + " End Time: " + str(self.__end_time)
+        return "Id: " + str(self.__id) + " Quality: " + str(self.__sleepquality) + " Start Time: " + str(self.__start_time) + " End Time: " + str(self.__end_time)

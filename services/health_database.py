@@ -564,20 +564,14 @@ def get_sleep_sessions(search_date_date: date) -> []:
 
     try:
 
-        print("in try")
-
         sql = f"SELECT start_time, end_time, sleep_quality, notes, id, date FROM sleep WHERE date = '{search_date_date.strftime('%Y-%m-%d')}'"
 
         cursor.execute(sql)
 
         rows = cursor.fetchall()
 
-        print("in try - rows = " + str(rows))
-
         for row in rows:
             sleep_sessions.append((row[0], row[1], row[2], row[3], row[4], row[5]))
-
-        print("in try - sleep_sessions[] = " + str(sleep_sessions))
 
     except Exception as ex:
 
@@ -590,7 +584,7 @@ def get_sleep_sessions(search_date_date: date) -> []:
     return sleep_sessions
 
 
-def update_sleep_session(id:int, star_time: str, end_time:str, sleep_quality: str, notes: str) -> bool:
+def update_sleep_session(id:int, start_time: str, end_time:str, sleep_quality: str, notes: str) -> bool:
 
     # update workout record
 
@@ -600,7 +594,16 @@ def update_sleep_session(id:int, star_time: str, end_time:str, sleep_quality: st
     return_value: bool = True
 
     try:
-        sql = (f"Update sleep Set star_time = '{star_time}', end_time = {end_time}, sleep_quality = '{sleep_quality}', notes = '{notes}' WHERE id = {id}")
+
+        # print ("in try - start_time = " + start_time)
+        # print("in try - end_time = " + end_time)
+        # print("in try - sleep_quality = " + sleep_quality)
+        # print("in try - notes = " + notes)
+        # print("in try - id = " + str(id))
+
+        sql = (f"Update sleep Set start_time = '{start_time}', end_time = '{end_time}', sleep_quality = '{sleep_quality}', notes = '{notes}' WHERE id = {id}")
+
+        # print("in try - sql = " + sql)
 
         cursor.execute(sql)
 
@@ -608,7 +611,7 @@ def update_sleep_session(id:int, star_time: str, end_time:str, sleep_quality: st
 
     except Exception as ex:
 
-        print("uupdate_sleep_session - in exception - " + str(ex))
+        print("update_sleep_session - in exception - " + str(ex))
 
         return_value = False
 

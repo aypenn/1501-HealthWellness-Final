@@ -36,6 +36,8 @@ def gen_selection_list(list_elements, header1, header2 = ""):
 
 def gen_sleep_session_list(list_elements, header1, header2=""):
 
+    format_layout = "%Y-%m-%d %H:%M"
+
     print("\n### " + header1 + " : ###\n")
 
     if header2 != "":
@@ -44,10 +46,16 @@ def gen_sleep_session_list(list_elements, header1, header2=""):
     choice_number = 1
 
     for element in list_elements:
-        elstr = str(element)
-        elstr = elstr.replace("(", "")
-        elstr = elstr.replace(")", "")
-        print(str(choice_number) + ". " + str(elstr))
+        st = datetime.strptime(element[0], format_layout)
+        et = datetime.strptime(element[1], format_layout)
+        td:datetime = et - st
+
+        h:int = int(td.total_seconds() / 3600)
+        m:int = int((td.total_seconds()/ 60) % 60)
+        duration = str(h) + " hours " + str(m) + " mins,"
+
+        sleep_str = "Sleep Time: " + element[0] + " - " + element[1] + ", Duration: " + duration + " Quality: " + element[2] + ", Notes: " + element[3]
+        print(str(choice_number) + ". " + sleep_str)
         choice_number += 1
 
 def get_date(input_message):
@@ -289,7 +297,6 @@ def add_sleep_session():
         print("1. Overnight")
         print("2. Same day sleep")
         overnight_day = get_int_range(input("\nEnter type of sleep: "),  1, 2)
-        print("overnight_day = " + str(overnight_day))
 
     sleep_end_date: date = sleep_start_date
 
@@ -908,7 +915,9 @@ def update_sleep_session():
 
                 while not update_done:
 
-                    wk_element = list(element_list[element_choice - 1])
+                    wk_element_tuple = list(element_list[element_choice - 1])
+
+                    wk_element = SleepSession(wk_element_tuple[5], wk_element_tuple[0], wk_element_tuple[1], wk_element_tuple[2], wk_element_tuple[3], wk_element_tuple[4])
 
                     max_mod_item_choice_number = len(mod_selection)
 
@@ -925,19 +934,35 @@ def update_sleep_session():
 
                         # process Modify start time
 
+                        overnight_day = 0
+
                         while overnight_day <= 0 or overnight_day > 2:
                             print("### Add Sleep Session ###\n")
                             print("Type of Sleep:")
                             print("1. Overnight")
                             print("2. Same day sleep")
                             overnight_day = get_int_range(input("\nEnter type of sleep: "), 1, 2)
-                            print("overnight_day = " + str(overnight_day))
 
                         start_time = get_time("Enter start time(HH:MM): ")
+
+                        wk_element.set_start_time(str(wk_element.session_date()) + " " + start_time)
+                        health_database.update_sleep_session(wk_element.id(), wk_element.start_time(), wk_element.end_time(), wk_element.sleep_quality(), wk_element.notes())
 
                     elif mod_choice == 2:
 
                         # process Modify end time
+
+                        overnight_day = 0
+
+                        while overnight_day <= 0 or overnight_day > 2:
+                            print("### Add Sleep Session ###\n")
+                            print("Type of Sleep:")
+                            print("1. Overnight")
+                            print("2. Same day sleep")
+                            overnight_day = get_int_range(input("\nEnter type of sleep: "), 1, 2)
+
+
+                        start_time = wk_element.start_time()
 
                         end_time_good = False
 
@@ -996,6 +1021,7 @@ def update_sleep_session():
                         update_done = True
 
                 else:
+
                     mod_done = True
 
 
