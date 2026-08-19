@@ -5,11 +5,14 @@ from pathlib import Path
 
 import services.health_data as health_data
 from models.DayEntity import *
+from models.SleepQuality import SleepQuality
 from services import health_database
 from utils.input_utils import *
 
 def read_xml_file():
-    xml_file = str(Path(__file__).parent) + "\\Meals_Workouts.xml"
+    # xml_file = str(Path(__file__).parent) + "\\Meals_Workouts.xml"
+
+    xml_file = str(Path(__file__).parent) + "\\Meals_Workouts_Sleep.xml"
 
     # print("xml_file = ", xml_file)
 
@@ -21,6 +24,9 @@ def read_xml_file():
 
     threads_meals = []
     threads_workouts = []
+    threads_sleep = []
+
+    sq = ["Very Poor", "Poor", "Fair", "Good", "Excellent"]
 
     for meal in root.findall("meal"):
 
@@ -31,7 +37,7 @@ def read_xml_file():
         calories = meal.find("calories").text
         meal_type = meal.find("meal_type").text
 
-        t = threading.Thread(target=health_database.add_meal, args=(wk_date, Meal(desc, meal_type, int(calories))))
+        t = threading.Thread(target=health_database.add_meal, args=(wk_date, desc, meal_type, int(calories)))
         threads_meals.append(t)
         t.start()
 
@@ -48,20 +54,26 @@ def read_xml_file():
         calories = workout.find("calories").text
         workout_type = workout.find("workout_type").text
 
-        t = threading.Thread(target=health_database.add_workout, args=(wk_date, Workout(desc, workout_type, int(calories))))
+        t = threading.Thread(target=health_database.add_workout, args=(wk_date, desc, workout_type, int(calories)))
         threads_meals.append(t)
         t.start()
 
     for t in threads_workouts:
             t.join()
 
-        # # add date entity if nat already added
-        #
-        # if health_data.get_day(wk_date) is not None:
-        #     health_data.add_day(wk_date)
+    for sleep in root.findall("sleep"):
+        wk_date_str = sleep.get("date")
+        wk_date: date = datetime.strptime(wk_date_str, "%m/%d/%Y")
 
+        start_time = sleep.find("start_time").text
+        end_time = sleep.find("end_time").text
+        sleep_quality = int(sleep.find("sleep_quality").text) - 1
+        notes = sleep.find("notes").text
 
-        # # add workout data to health_data
-        # health_data.add_workout(date(wk_date.year, wk_date.month, wk_date.day), Workout(desc, workout_type, int(calories)))
+        t = threading.Thread(target=health_database.add_sleep_session,
+                             args=(wk_date, start_time, end_time, sq[sleep_quality], notes))
+        threads_sleep.append(t)
+        t.start()
 
-        # result = health_database.add_workout(wk_date, Workout(desc, workout_type, int(calories)))
+    for t in threads_workouts:
+        t.join()
