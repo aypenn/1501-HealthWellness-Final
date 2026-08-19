@@ -913,11 +913,20 @@ def update_sleep_session():
 
                 update_done = False
 
+                wk_element_tuple = element_list[element_choice - 1]
+
+                wk_element = SleepSession(wk_element_tuple[5], wk_element_tuple[0], wk_element_tuple[1],
+                                          wk_element_tuple[2], wk_element_tuple[3], wk_element_tuple[4])
+
                 while not update_done:
 
-                    wk_element_tuple = list(element_list[element_choice - 1])
+                    # wk_element_tuple = list(element_list[element_choice - 1])
+                    # wk_element_tuple = element_list[element_choice - 1]
+                    #
+                    # wk_element = SleepSession(wk_element_tuple[5], wk_element_tuple[0], wk_element_tuple[1], wk_element_tuple[2], wk_element_tuple[3], wk_element_tuple[4])
+                    # wk_element = SleepSession(wk_element_tuple.id(), wk_element_tuple, wk_element_tuple[1], wk_element_tuple[2], wk_element_tuple[3], wk_element_tuple[4])
 
-                    wk_element = SleepSession(wk_element_tuple[5], wk_element_tuple[0], wk_element_tuple[1], wk_element_tuple[2], wk_element_tuple[3], wk_element_tuple[4])
+                    # wk_element = element_list[element_choice - 1]
 
                     max_mod_item_choice_number = len(mod_selection)
 
@@ -961,23 +970,27 @@ def update_sleep_session():
                             print("2. Same day sleep")
                             overnight_day = get_int_range(input("\nEnter type of sleep: "), 1, 2)
 
-
                         start_time = wk_element.start_time()
 
                         end_time_good = False
 
+                        end_date:date = wk_element.session_date()
+
                         while not end_time_good:
                             end_time = get_time("Enter end time(HH:MM): ")
+                            time_format = "%H:%M"
                             if overnight_day == 2:
-                                time_format = "%H:%M"
                                 if datetime.strptime(end_time, time_format) < datetime.strptime(start_time, time_format):
                                     print("End time can not be less than start time for same day sleep")
-                                else:
-                                    end_time_good = True
-                        else:
-                            end_time_good = True
+                            else:
+                                print("end_date = " + str(end_date))
+                                end_date = datetime.strptime(end_date, "%Y-%m-%d") + timedelta(days=1)
+                                end_time_good = True
 
-                            # update_element(sleep_quality, wk_element)
+
+
+                        wk_element.set_end_time(end_date.strftime("%Y-%m-%d") + " " + end_time)
+                        health_database.update_sleep_session(wk_element.id(), wk_element.start_time(), wk_element.end_time(), wk_element.sleep_quality(), wk_element.notes())
 
                     elif mod_choice == 3:
 
@@ -992,23 +1005,28 @@ def update_sleep_session():
                             gen_selection_list(sleep_quality_list, "Choose Workout Type")
                             print(str(max_type_choices) + ". Exit\n")
 
-                            type_choice = get_int_range(input("Choose Workout Type: "), 1, max_type_choices)
+                            type_choice = get_int_range(input("Choose Quality Type: "), 1, max_type_choices)
 
                             # print("type_choice = " + type_choice)
 
                             if type_choice is None:
 
-                                print("Entered Workout Type Cannot be Blank")
+                                print("Entered Quality Type Cannot be Blank")
 
                             elif type_choice < 1 or type_choice > max_type_choices:
 
                                 print("Workout Type Must be Between 1 And " + str(max_type_choices))
 
                             elif type_choice < max_type_choices:
+                                print("in elif")
                                 sleep_quality_choice = sleep_quality_list[type_choice - 1]
-                                wk_element[1] = sleep_quality_choice
+                                print("in elif - sleep_quality_choice = " + str(sleep_quality_choice))
+                                wk_element.set_quality(str(sleep_quality_choice))
+                                print("in elif - wk_element = " + str(wk_element))
                                 element_list[element_choice - 1] = wk_element
-                                health_database.update_sleep_session(wk_element[3], wk_element[0], wk_element[2], wk_element[1])
+                                print("in elif - wk_element = " + str(element_list[element_choice - 1]))
+                                health_database.update_sleep_session(wk_element.id(), wk_element.start_time(), wk_element.end_time(), wk_element.sleep_quality(), wk_element.notes())
+                                print("in elif - done")
                                 sleep_quality_done = True
 
                             else:

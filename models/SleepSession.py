@@ -50,7 +50,8 @@ class SleepSession:
         self.__end_time = end_time
 
     def set_quality(self, quality: str):
-        self.__quality = quality
+        print("in set_quality: " + str(quality))
+        self.__sleepquality = quality
 
     def set_notes(self, notes: str):
         self.__notes = notes
