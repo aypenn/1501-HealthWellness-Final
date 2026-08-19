@@ -1018,20 +1018,22 @@ def update_sleep_session():
                                 print("Workout Type Must be Between 1 And " + str(max_type_choices))
 
                             elif type_choice < max_type_choices:
-                                print("in elif")
                                 sleep_quality_choice = sleep_quality_list[type_choice - 1]
-                                print("in elif - sleep_quality_choice = " + str(sleep_quality_choice))
                                 wk_element.set_quality(str(sleep_quality_choice))
-                                print("in elif - wk_element = " + str(wk_element))
                                 element_list[element_choice - 1] = wk_element
-                                print("in elif - wk_element = " + str(element_list[element_choice - 1]))
                                 health_database.update_sleep_session(wk_element.id(), wk_element.start_time(), wk_element.end_time(), wk_element.sleep_quality(), wk_element.notes())
-                                print("in elif - done")
                                 sleep_quality_done = True
 
                             else:
                                 sleep_quality_done = True
                                 update_done = True
+
+                    elif mod_choice == 4:
+
+                        sleep_notes = input("Enter notes on the sleep: ").strip()
+                        wk_element.set_notes(str(sleep_notes))
+                        health_database.update_sleep_session(wk_element.id(), wk_element.start_time(), wk_element.end_time(), wk_element.sleep_quality(), wk_element.notes())
+                        sleep_quality_done = True
 
                     else:
 
@@ -1061,10 +1063,15 @@ def delete_element(element_type):
         element_list = health_database.get_meals(element_date)
         element_type_list = list(MealType)
 
-    else:
+    elif element_type == "Workout":
 
         element_list = health_database.get_workouts(element_date)
         element_type_list = list(WorkoutType)
+
+    else:
+
+        element_list = health_database.get_sleep_sessions(element_date)
+        element_type_list = list(SleepQuality)
 
     choice: int | None = None
 
@@ -1108,14 +1115,20 @@ def delete_element(element_type):
 
             elif 1 <= choice < choice_number:
 
-
-                id = element_list[choice - 1][3]
+                if element_type != "Sleep Session":
+                    id = element_list[choice - 1][3]
+                else:
+                    id = element_list[choice - 1][4]
 
                 if element_type == "Meal":
                     health_database.delete_meal(id)
 
-                else:
+                elif element_type == "Workout":
+
                     health_database.delete_workout(id)
+
+                else:
+                    health_database.delete_sleep_session(id)
 
                 del element_list[choice - 1]
                 if len(element_list) == 0:

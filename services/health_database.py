@@ -595,15 +595,15 @@ def update_sleep_session(id:int, start_time: str, end_time:str, sleep_quality: s
 
     try:
 
-        print ("in try - start_time = " + start_time)
-        print("in try - end_time = " + end_time)
-        print("in try - sleep_quality = " + sleep_quality)
-        print("in try - notes = " + notes)
-        print("in try - id = " + str(id))
+        # print ("in try - start_time = " + start_time)
+        # print("in try - end_time = " + end_time)
+        # print("in try - sleep_quality = " + sleep_quality)
+        # print("in try - notes = " + notes)
+        # print("in try - id = " + str(id))
 
         sql = (f"Update sleep Set start_time = '{start_time}', end_time = '{end_time}', sleep_quality = '{sleep_quality}', notes = '{notes}' WHERE id = {id}")
 
-        print("in try - sql = " + sql)
+        # print("in try - sql = " + sql)
 
         cursor.execute(sql)
 
@@ -620,4 +620,33 @@ def update_sleep_session(id:int, start_time: str, end_time:str, sleep_quality: s
         conn.close()  # close no matter error or not
 
     return return_value
+
+def delete_sleep_session(id:int) -> bool:
+
+    # delete workout record
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    return_value: bool = True
+
+    try:
+        sql = (f"Delete From sleep WHERE id = {id}")
+
+        cursor.execute(sql)
+
+        conn.commit()
+
+    except Exception as ex:
+
+        print("delete_sleep_session - in exception - " + str(ex))
+
+        return_value = False
+
+    finally:
+
+        conn.close()  # close no matter error or not
+
+    return return_value
+
 
