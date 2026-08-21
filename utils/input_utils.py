@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, datetime
 from datetime import timedelta
 
 #takes input num and returns the integer value.  Returns None if not an int
@@ -34,10 +34,26 @@ def get_valid_date(date_str : str) -> date | None:
                 valid_date = date(year, month, day)
             except Exception:
                 pass
-        # build string date
-        # then parse as the other
 
     return valid_date
+
+#converts date string to date
+def valid_time(time_str : str) -> bool:
+
+    if len(time_str) == 5 and time_str[2] == ":":
+        # break up the time and parse
+        split_time = time_str.split(":")
+        hour = get_int(split_time[0])
+        minutes = get_int(split_time[1])
+
+        try:
+            time_format = "%H:%M"
+            datetime.strptime(time_str, time_format)
+            return True
+        except Exception:
+            return False
+
+
 
  # -------------------------------
 # get_valid_date

@@ -33,9 +33,9 @@ def main():
     # print menu - We will be adding to these as we go throughout the course
 
 
-    main_choice_list = ["Add Meal", "Add Workout", "Search Date", "Modify Meal", "Delete Meal",
-                        "Modify Workout", "Delete Workout", "Filter By Date", "Load In From XML",
-                        "Exit"]
+    main_choice_list = ["Add Meal", "Add Workout", "Add Sleep", "Search Date", "Modify Meal",
+                        "Delete Meal", "Modify Workout", "Delete Workout",  "Modify Sleep", "Delete Sleep Session",
+                        "Filter By Date", "Load In From XML", "Exit"]
 
     main_choice_list_len = len(main_choice_list)
 
@@ -59,22 +59,28 @@ def main():
                 case 2:
                     add_workout()
                 case 3:
-                    search_date()
+                    add_sleep_session()
                 case 4:
+                    search_date()
+                case 5:
                     # update_calorie_element("Meal")
                     update_meal()
-                case 5:
-                    delete_element("Meal")
                 case 6:
+                    delete_element("Meal")
+                case 7:
                     # update_calorie_element("Workout")
                     update_workout()
-                case 7:
-                    delete_element("Workout")
                 case 8:
-                    filter_by_date()
+                    delete_element("Workout")
                 case 9:
-                    read_xml_file()
+                    update_sleep_session()
                 case 10:
+                    delete_element("Sleep Session")
+                case 11:
+                    filter_by_date()
+                case 12:
+                    read_xml_file()
+                case 13:
                     print("\nSystem Exiting...")
 
             # test code - leave in

@@ -13,6 +13,7 @@ class DayEntity:
         self.__entry_date = entry_date
         self.__meal = []
         self.__workout = []
+        self.__sleep = []
 
     # def __new__(cls, entry_date: date):
     #
